@@ -3,14 +3,17 @@
 1.
 ```
 from math import atan,degrees
-from subprocess import call
+import os 
 
-def limpiar_pantalla(): #Función para limpiar la consola
-    call("cls",shell=True)
+def limpiar_pantalla():
+    """Limpia la consola."""
+    os.system("cls" if os.name == "nt" else "clear")
 
-def continuar(): # Función para limpiar la consola dando Enter
-    input("\nEnter para continuar")
-    call("cls",shell=True)
+def continuar():
+        """Pausa la ejecución hasta que el usuario presione Enter."""
+        input("\nPresiona Enter para continuar...")
+        Calculadora.limpiar_pantalla()
+
 
 class Point:
     def __init__(self, x: float=0, y: float=0):
@@ -176,3 +179,105 @@ if contenencia:
 else:
     print(f"El punto de coordenadas {horizontal_coord},{vertical_coord} NO está dentro del rectángulo")
 ```
+
+from math import atan, degrees
+import os
+import numpy as np
+
+
+def limpiar_pantalla():
+    """Limpia la consola."""
+    os.system("cls" if os.name == "nt" else "clear")
+
+
+def continuar():
+    """Pausa la ejecución hasta que el usuario presione Enter."""
+    input("\nPresiona Enter para continuar...")
+
+
+class Point:
+    """Clase que representa un punto en el espacio 2D."""
+    def __init__(self, x: float = 0, y: float = 0):
+        self.x = x
+        self.y = y
+
+
+class Line:
+    """Clase que representa una línea en el espacio 2D."""
+    def __init__(self, start: Point, end: Point):
+        self.start = start
+        self.end = end
+        self.length = self.compute_length()
+        self.slope = self.compute_slope()
+
+    def compute_length(self) -> float:
+        """Calcula la longitud de la línea."""
+        return ((self.end.x - self.start.x)**2 + (self.end.y - self.start.y)**2)**0.5
+
+    def compute_slope(self):
+        """Calcula la pendiente de la línea en grados desde la horizontal."""
+        x_displacement = self.end.x - self.start.x
+        y_displacement = self.end.y - self.start.y
+        if x_displacement == 0:
+            return None  # Pendiente indefinida para una línea vertical
+        return degrees(atan(y_displacement / x_displacement))
+
+    def compute_horizontal_cross(self) -> bool:
+        """Verifica si la línea cruza el eje X."""
+        return self.start.y * self.end.y <= 0
+
+    def compute_vertical_cross(self) -> bool:
+        """Verifica si la línea cruza el eje Y."""
+        return self.start.x * self.end.x <= 0
+
+    def discretize_line(self, n: int) -> np.ndarray:
+        """Divide la línea en `n` puntos igualmente espaciados."""
+        x_points = np.linspace(self.start.x, self.end.x, n)
+        y_points = np.linspace(self.start.y, self.end.y, n)
+        return np.array(list(zip(x_points, y_points)))
+
+
+class Rectangle:
+    """Clase que representa un rectángulo."""
+    def __init__(self, top_line: Line, bottom_line: Line, left_line: Line, right_line: Line):
+        self.top_line = top_line
+        self.bottom_line = bottom_line
+        self.left_line = left_line
+        self.right_line = right_line
+
+        # Calculamos el ancho y alto automáticamente
+        self.width = self.top_line.compute_length()
+        self.height = self.left_line.compute_length()
+
+    def compute_area(self) -> float:
+        """Calcula el área del rectángulo."""
+        return self.width * self.height
+
+    def compute_perimeter(self) -> float:
+        """Calcula el perímetro del rectángulo."""
+        return 2 * (self.width + self.height)
+
+
+# Ejemplo de uso
+if __name__ == "__main__":
+    limpiar_pantalla()
+
+    # Crear puntos para los vértices
+    bottom_left = Point(0, 0)
+    bottom_right = Point(4, 0)
+    top_left = Point(0, 3)
+    top_right = Point(4, 3)
+
+    # Crear líneas
+    bottom_line = Line(bottom_left, bottom_right)
+    top_line = Line(top_left, top_right)
+    left_line = Line(bottom_left, top_left)
+    right_line = Line(bottom_right, top_right)
+
+    # Crear rectángulo
+    rect = Rectangle(top_line, bottom_line, left_line, right_line)
+
+    print(f"Área del rectángulo: {rect.compute_area()}")
+    print(f"Perímetro del rectángulo: {rect.compute_perimeter()}")
+
+    continuar()
