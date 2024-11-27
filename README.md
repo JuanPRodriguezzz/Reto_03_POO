@@ -179,7 +179,7 @@ if contenencia:
 else:
     print(f"El punto de coordenadas {horizontal_coord},{vertical_coord} NO está dentro del rectángulo")
 ```
-
+``` python
 from math import atan, degrees
 import os
 import numpy as np
@@ -281,3 +281,4 @@ if __name__ == "__main__":
     print(f"Perímetro del rectángulo: {rect.compute_perimeter()}")
 
     continuar()
+```
