@@ -1,7 +1,7 @@
 # Reto_03_POO
 ### Juan Pablo Rodríguez Cruz
 
-# 1. **Create a repo with the class exercise**
+## 1. **Create a repo with the class exercise**
 
 1. Create class Line.
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     continuar()
 ```
 
-# 2. 
+## 2. 
 **Restaurant scenario:** You want to design a program to calculate the bill for a customer's order in a restaurant.
 - Define a base class *MenuItem*: This class should have attributes like name, price, and a method to calculate the total price.
 - Create subclasses for different types of menu items: Inherit from *MenuItem* and define properties specific to each type (e.g., Beverage, Appetizer, MainCourse). 
