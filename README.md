@@ -282,3 +282,212 @@ if __name__ == "__main__":
 
     continuar()
 ```
+DIAGRAMA
+
+```mermaid
+classDiagram
+    class MenuItem {
+        - name: str
+        - price: float
+        + calculate_price(): float
+    }
+
+    class Beverage {
+        - is_alcoholic: bool
+    }
+    MenuItem <|-- Beverage
+
+    class Appetizer {
+    }
+    MenuItem <|-- Appetizer
+
+    class MainCourse {
+        - is_vegetarian: bool
+    }
+    MenuItem <|-- MainCourse
+
+    class Order {
+        - items: List[MenuItem]
+        + add_item(item: MenuItem): void
+        + calculate_total(): float
+        + apply_discount(discount_percentage: float): float
+        + calculate_auto_discount(): float
+        + show_order_summary(): void
+        + limpiar_pantalla(): static void
+        + continuar(): static void
+    }
+
+    MenuItem <.. Order : "compone"
+```
+
+CÓDIGO
+
+```python
+import os
+
+class MenuItem:
+    """Clase base para un elemento del menú."""
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+    def calculate_price(self):
+        return self.price
+
+
+class Beverage(MenuItem):
+    """Subclase para bebidas."""
+
+    def __init__(self, name, price, is_alcoholic):
+        super().__init__(name, price)
+        self.is_alcoholic = is_alcoholic
+
+
+class Appetizer(MenuItem):
+    """Subclase para aperitivos."""
+
+    def __init__(self, name, price):
+        super().__init__(name, price)
+      
+
+
+class MainCourse(MenuItem):
+    """Subclase para platos principales."""
+
+    def __init__(self, name, price, is_vegetarian):
+        super().__init__(name, price)
+        self.is_vegetarian = is_vegetarian
+
+
+class Order:
+    """Clase que representa el pedido de un cliente."""
+
+    def __init__(self):
+        self.items = []
+
+    def add_item(self, item):
+        if isinstance(item, MenuItem):
+            self.items.append(item)
+        else:
+            raise ValueError("El elemento debe ser un objeto de tipo MenuItem")
+
+    def calculate_total(self):
+        return sum(item.calculate_price() for item in self.items)
+
+    def apply_discount(self, discount_percentage):
+        total = self.calculate_total()
+        discount = total * (discount_percentage / 100)
+        return total - discount
+
+    def calculate_auto_discount(self):
+        combos = {
+            ("Mojarra", "Ceviche", "Limonada de Coco"): 12,
+            ("Mojarra", "Empanadas de camarón(4und)", "Limonada de Coco"): 10,
+            ("Chunchullo", "Bandeja Paisa"): 8,
+            ("Churrasco", "Empanadas de carne(4und)"): 8,
+            ("Medio Churrasco", "Empanadas de carne(4und)"): 5
+        }
+        
+        applied_discount = 0
+        for combo, discount in combos.items():
+            if all(any(item.name == combo_item for item in self.items) for combo_item in combo):
+                applied_discount = max(applied_discount, discount)
+        return applied_discount
+
+    def show_order_summary(self):
+        print("Resumen del pedido:")
+        for item in self.items:
+            print(f"{item.name}: ${item.price:.2f}")
+        print(f"Total: ${self.calculate_total():.2f}")
+
+    @staticmethod
+    def limpiar_pantalla():
+        """Limpia la consola."""
+        os.system("cls" if os.name == "nt" else "clear")
+
+    @staticmethod
+    def continuar():
+        """Pausa la ejecución hasta que el usuario presione Enter."""
+        input("\nPresiona Enter para continuar...")
+        Order.limpiar_pantalla()
+
+
+def menu_principal():
+    menu = [
+        Beverage("Gaseosa 600 mL", 7000, False),
+        Beverage("Cerveza artesanal", 15000, True),
+        Beverage("Cerveza Heineken botella", 10000, True),
+        Beverage("Limonada de coco", 10000, False),
+        Beverage("Agua", 5000, False),
+        Appetizer("Empanadas de pollo(4und)", 10000),
+        Appetizer("Empanadas de carne(4und)", 10000),
+        Appetizer("Empanadas de camarón(4und)", 12000),
+        Appetizer("Chunchullo", 18000),
+        Appetizer("Ceviche", 15000),
+        MainCourse("Churrasco", 40000, False),
+        MainCourse("Medio Churrasco", 28000, False),
+        MainCourse("Bandeja Paisa", 38000, False),
+        MainCourse("Hamburguesa", 33000, False),
+        MainCourse("Hamburguesa vegetariana", 36000, True),
+        MainCourse("Mojarra", 38000, False)
+    ]
+
+    order = Order()
+
+    while True:
+        Order.limpiar_pantalla()
+        print("Menú del Restaurante:")
+        print("\n--- Bebidas ---")
+        for i, item in enumerate(menu, start=1):
+            if isinstance(item, Beverage):
+                print(f"{i}. {item.name} - ${item.price:.2f}")
+        print("\n--- Aperitivos ---")
+        for i, item in enumerate(menu, start=1):
+            if isinstance(item, Appetizer):
+                print(f"{i}. {item.name} - ${item.price:.2f}")
+        print("\n--- Platos principales ---")
+        for i, item in enumerate(menu, start=1):
+            if isinstance(item, MainCourse):
+                print(f"{i}. {item.name} - ${item.price:.2f}")
+
+        try:
+            choices = input("\nIngrese los números de los items separados por comas: ").strip()
+
+            choices = [int(choice) - 1 for choice in choices.split(",") if choice.strip().isdigit()]
+            for choice in choices:
+                if 0 <= choice < len(menu):
+                    order.add_item(menu[choice])
+                    print(f"{menu[choice].name} agregado al pedido.")
+                else:
+                    print(f"El número {choice + 1} no es válido y se ignoró.")
+        except ValueError:
+            print("\nEntrada inválida. Por favor, ingrese solo números separados por comas.")
+
+        confirm = input("\n¿Desea agregar más items? (s/n): ").strip().lower()
+        if confirm != 's':
+            break
+
+    Order.limpiar_pantalla()
+    print("\nResumen Final del Pedido:")
+    order.show_order_summary()
+
+    confirm = input("\n¿Confirma su pedido? (s/n): ").strip().lower()
+    if confirm == 's':
+        auto_discount = order.calculate_auto_discount()
+        if auto_discount > 0:
+            print(f"\nSe ha aplicado un descuento automático del {auto_discount}%.")
+            total_with_discount = order.apply_discount(auto_discount)
+            print(f"Total después del descuento: ${total_with_discount:.2f}")
+        else:
+            print("\nNo se aplicó ningún descuento automático.")
+
+        print("\nGracias por su pedido. Que tenga un buen día.")
+    else:
+        print("\nEl pedido fue cancelado.")
+
+
+if __name__ == "__main__":
+    menu_principal()
+```
+
