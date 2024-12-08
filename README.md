@@ -76,14 +76,30 @@ class Line:
 
 class Rectangle:
     """Clase que representa un rectángulo."""
-    def __init__(self, top_line: Line, bottom_line: Line, left_line: Line, right_line: Line):
-        self.top_line = top_line
-        self.bottom_line = bottom_line
-        self.left_line = left_line
-        self.right_line = right_line
 
-        self.width = self.top_line.compute_length()
-        self.height = self.left_line.compute_length()
+    def __init__(self, width: float, height: float, center: Point):
+        self.width = width
+        self.height = height
+        self.center = center
+
+    @classmethod
+    def from_bottom_left(cls, bottom_left: Point, width: float, height: float):
+        """Inicializa el rectángulo usando la esquina inferior izquierda, ancho y alto."""
+        center = Point(bottom_left.x + width / 2, bottom_left.y + height / 2)
+        return cls(width, height, center)
+
+    @classmethod
+    def from_center(cls, center: Point, width: float, height: float):
+        """Inicializa el rectángulo usando el centro, ancho y alto."""
+        return cls(width, height, center)
+
+    @classmethod
+    def from_corners(cls, bottom_left: Point, top_right: Point):
+        """Inicializa el rectángulo usando dos esquinas opuestas."""
+        width = top_right.x - bottom_left.x
+        height = top_right.y - bottom_left.y
+        center = Point(bottom_left.x + width / 2, bottom_left.y + height / 2)
+        return cls(width, height, center)
 
     def compute_area(self) -> float:
         """Calcula el área del rectángulo."""
@@ -98,25 +114,26 @@ class Rectangle:
 if __name__ == "__main__":
     limpiar_pantalla()
 
-    # Crear puntos para los vértices
+    # Inicialización por esquina inferior izquierda
     bottom_left = Point(0, 0)
-    bottom_right = Point(4, 0)
-    top_left = Point(0, 3)
+    rect1 = Rectangle.from_bottom_left(bottom_left, 4, 3)
+    print(f"Área del rectángulo 1: {rect1.compute_area()}")
+    print(f"Perímetro del rectángulo 1: {rect1.compute_perimeter()}")
+
+    # Inicialización por el centro
+    center = Point(2, 1.5)
+    rect2 = Rectangle.from_center(center, 4, 3)
+    print(f"Área del rectángulo 2: {rect2.compute_area()}")
+    print(f"Perímetro del rectángulo 2: {rect2.compute_perimeter()}")
+
+    # Inicialización por esquinas opuestas
     top_right = Point(4, 3)
-
-    # Crear líneas
-    bottom_line = Line(bottom_left, bottom_right)
-    top_line = Line(top_left, top_right)
-    left_line = Line(bottom_left, top_left)
-    right_line = Line(bottom_right, top_right)
-
-    # Crear rectángulo
-    rect = Rectangle(top_line, bottom_line, left_line, right_line)
-
-    print(f"Área del rectángulo: {rect.compute_area()}")
-    print(f"Perímetro del rectángulo: {rect.compute_perimeter()}")
+    rect3 = Rectangle.from_corners(bottom_left, top_right)
+    print(f"Área del rectángulo 3: {rect3.compute_area()}")
+    print(f"Perímetro del rectángulo 3: {rect3.compute_perimeter()}")
 
     continuar()
+
 ```
 
 ## 2. 
